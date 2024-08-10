@@ -29,6 +29,31 @@ app.post("/AdminSignUp", async (req, res) => {
     )
 })
 
+app.post("/AdminSignIn",async(req,res)=>{
+    let input=req.body
+    let result=adminModel.find({username:input.username}).then(
+        (items)=>{
+            if (items.length>0){
+                const passwordValidator=bcrypt.compareSync(input.password,items[0].password)
+                if (passwordValidator){
+                    jwt.sign({username:input.username},"wayanadApp",{expiresIn:"1d"},(error,token)=>{
+                        if(error){
+                            res.json({"status":"error","error":error})
+                        }else{
+                            console.log(input)
+                            res.json({"status":"success","token":token,"userId":items[0]._id})
+                        }
+                    })
+                }else{
+                    res.json({"status":"incorrect password"})
+                }
+            }else{
+                res.json({"status":"invalid username"})
+            }
+        }
+    ).catch()
+})
+
 app.listen(3300, () => {
     console.log("Server Started")
 }
