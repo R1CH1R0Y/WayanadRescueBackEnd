@@ -4,12 +4,28 @@ const cors = require("cors")
 const bcrypt = require("bcrypt")
 const jwt = require("jsonwebtoken")
 const adminModel = require("./models/admin")
+const missingModel = require("./models/missing")
 
 let app = express()
 app.use(express.json())
 app.use(cors())
 
 mongoose.connect("mongodb+srv://Richi2001:R1CH1R0Y@cluster0.ulfkc.mongodb.net/WayanadRescueDb?retryWrites=true&w=majority&appName=Cluster0")
+
+app.post("/Add",async(req,res)=>{
+    let input=req.body
+    let token=req.headers.token
+    jwt.verify(token,"wayanadApp",async(error,decoded)=>{
+        if(decoded){
+            console.log(input)
+            let result=new missingModel(input)
+            await result.save()
+            res.json({"status":"success"})
+        }else{
+            res.json({"status":"invalid authentication"})
+        }
+    })
+})
 
 app.post("/AdminSignUp", async (req, res) => {
     let input = req.body
