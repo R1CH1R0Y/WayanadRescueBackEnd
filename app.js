@@ -27,6 +27,26 @@ app.post("/Add",async(req,res)=>{
     })
 })
 
+app.post("/ViewAll",(req,res)=>{
+    let token=req.headers.token
+    jwt.verify(token,"wayanadApp",(error,decoded)=>{
+        if(decoded){
+            missingModel.find().then(
+                (items)=>{
+                    console.log(items)
+                    res.json(items)
+                }
+            ).catch(
+                (error)=>{
+                    res.json({"status":"error"})
+                }
+            )
+        }else{
+            res.json({"status":"invalid authentication"})
+        }
+    })
+})
+
 app.post("/AdminSignUp", async (req, res) => {
     let input = req.body
     let hashedPassword = bcrypt.hashSync(input.password, 10)
@@ -41,6 +61,10 @@ app.post("/AdminSignUp", async (req, res) => {
                 result.save()
                 res.json({ "status": "success" })
             }
+        }
+    ).catch(
+        (error)=>{
+            res.json({"status":"error"})
         }
     )
 })
@@ -67,7 +91,11 @@ app.post("/AdminSignIn",async(req,res)=>{
                 res.json({"status":"invalid username"})
             }
         }
-    ).catch()
+    ).catch(
+        (error)=>{
+            res.json({"status":"error"})
+        }
+    )
 })
 
 app.listen(3300, () => {
